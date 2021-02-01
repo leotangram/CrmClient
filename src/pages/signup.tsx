@@ -5,19 +5,26 @@ import Layout from '../components/Layout'
 const Signup = () => {
   const formik = useFormik({
     initialValues: {
-      name: ``,
-      surname: ``,
-      email: ``,
-      password: ``
+      name: '',
+      surname: '',
+      email: '',
+      password: ''
     },
     onSubmit: values => {
       console.log({ values })
-    }
+    },
+    validationSchema: Yup.object({
+      name: Yup.string().required('El nombre es obligatorio'),
+      surname: Yup.string().required('El apellido es obligatorio')
+    })
   })
 
   const {
+    errors,
+    handleBlur,
     handleChange,
     handleSubmit,
+    touched,
     values: { name, surname, email, password }
   } = formik
 
@@ -42,11 +49,18 @@ const Signup = () => {
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="name"
+                onBlur={handleBlur}
                 onChange={handleChange}
                 placeholder="Nombre usuario"
                 type="text"
                 value={name}
               />
+              {touched.name && errors.name && (
+                <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+                  <p className="font-bold">Error</p>
+                  <p>{errors.name}</p>
+                </div>
+              )}
             </div>
             <div className="mb-4">
               <label
@@ -58,6 +72,7 @@ const Signup = () => {
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="surname"
+                onBlur={handleBlur}
                 onChange={handleChange}
                 placeholder="Apellido usuario"
                 type="text"
@@ -74,6 +89,7 @@ const Signup = () => {
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="email"
+                onBlur={handleBlur}
                 onChange={handleChange}
                 placeholder="Email usuario"
                 type="email"
@@ -90,6 +106,7 @@ const Signup = () => {
               <input
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="password"
+                onBlur={handleBlur}
                 onChange={handleChange}
                 placeholder="Password usuario"
                 type="password"

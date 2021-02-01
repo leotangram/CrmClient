@@ -12,21 +12,21 @@ const Sidebar = () => {
       <nav className="mt-5 list-none">
         <li
           className={`text-white block p-2 ${
-            router.pathname === `/` && `bg-blue-800`
+            router.pathname === '/' && 'bg-blue-800'
           }`}
         >
           <Link href="/">Clientes</Link>
         </li>
         <li
           className={`text-white block p-2 ${
-            router.pathname === `/orders` && `bg-blue-800`
+            router.pathname === '/orders' && 'bg-blue-800'
           }`}
         >
           <Link href="/orders">Pedidos</Link>
         </li>
         <li
           className={`text-white block p-2 ${
-            router.pathname === `/products` && `bg-blue-800`
+            router.pathname === '/products' && 'bg-blue-800'
           }`}
         >
           <Link href="/products">Productos</Link>
