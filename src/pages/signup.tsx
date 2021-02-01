@@ -15,7 +15,13 @@ const Signup = () => {
     },
     validationSchema: Yup.object({
       name: Yup.string().required('El nombre es obligatorio'),
-      surname: Yup.string().required('El apellido es obligatorio')
+      surname: Yup.string().required('El apellido es obligatorio'),
+      email: Yup.string()
+        .email('El email no es válido')
+        .required('El email es obligatorio'),
+      password: Yup.string()
+        .required('El password es obligatorio')
+        .min(6, 'El password debe ser de al menos 6 caractéres')
     })
   })
 
@@ -78,6 +84,12 @@ const Signup = () => {
                 type="text"
                 value={surname}
               />
+              {touched.surname && errors.surname && (
+                <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+                  <p className="font-bold">Error</p>
+                  <p>{errors.surname}</p>
+                </div>
+              )}
             </div>
             <div className="mb-4">
               <label
@@ -95,6 +107,12 @@ const Signup = () => {
                 type="email"
                 value={email}
               />
+              {touched.email && errors.email && (
+                <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+                  <p className="font-bold">Error</p>
+                  <p>{errors.email}</p>
+                </div>
+              )}
             </div>
             <div className="mb-4">
               <label
@@ -112,6 +130,12 @@ const Signup = () => {
                 type="password"
                 value={password}
               />
+              {touched.password && errors.password && (
+                <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
+                  <p className="font-bold">Error</p>
+                  <p>{errors.password}</p>
+                </div>
+              )}
             </div>
             <button
               className="bg-gray-800 w-full mt-5 p-2 text-white uppercase hover:bg-gray-900"
