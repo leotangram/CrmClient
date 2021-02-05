@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import { useMutation, gql } from '@apollo/client'
 import * as Yup from 'yup'
@@ -19,6 +20,7 @@ const Signup = () => {
   const [message, setMessage] = useState('')
 
   const [newUser] = useMutation(NEW_ACCOUNT)
+  const router = useRouter()
 
   const formik = useFormik({
     initialValues: {
@@ -39,7 +41,11 @@ const Signup = () => {
             }
           }
         })
-        console.log({ data })
+        setMessage(`Se creó correctamente el usuario: ${data.newUser.name}`)
+        setTimeout(() => {
+          setMessage('')
+          router.push('/login')
+        }, 3000)
       } catch (error) {
         setMessage(error.message)
         setTimeout(() => {
