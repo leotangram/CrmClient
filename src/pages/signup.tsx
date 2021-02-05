@@ -1,8 +1,22 @@
 import { useFormik } from 'formik'
+import { useMutation, gql } from '@apollo/client'
 import * as Yup from 'yup'
 import Layout from '../components/Layout'
 
+const NEW_ACCOUNT = gql`
+  mutation newUser($input: UserInput) {
+    newUser(input: $input) {
+      id
+      name
+      surname
+      email
+    }
+  }
+`
+
 const Signup = () => {
+  const [newUser] = useMutation(NEW_ACCOUNT)
+
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -10,8 +24,22 @@ const Signup = () => {
       email: '',
       password: ''
     },
-    onSubmit: values => {
-      console.log({ values })
+    onSubmit: async ({ name, surname, email, password }) => {
+      try {
+        const { data } = await newUser({
+          variables: {
+            input: {
+              name,
+              surname,
+              email,
+              password
+            }
+          }
+        })
+        console.log({ data })
+      } catch (error) {
+        console.log({ error })
+      }
     },
     validationSchema: Yup.object({
       name: Yup.string().required('El nombre es obligatorio'),
