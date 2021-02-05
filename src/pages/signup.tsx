@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useFormik } from 'formik'
 import { useMutation, gql } from '@apollo/client'
 import * as Yup from 'yup'
@@ -15,6 +16,8 @@ const NEW_ACCOUNT = gql`
 `
 
 const Signup = () => {
+  const [message, setMessage] = useState('')
+
   const [newUser] = useMutation(NEW_ACCOUNT)
 
   const formik = useFormik({
@@ -38,7 +41,10 @@ const Signup = () => {
         })
         console.log({ data })
       } catch (error) {
-        console.log({ error })
+        setMessage(error.message)
+        setTimeout(() => {
+          setMessage('')
+        }, 3000)
       }
     },
     validationSchema: Yup.object({
@@ -62,8 +68,15 @@ const Signup = () => {
     values: { name, surname, email, password }
   } = formik
 
+  const showMessage = (
+    <div className="bg-white py-2 px-3 w-full my-3 max-w-sm text-center mx-auto">
+      <p>{message}</p>
+    </div>
+  )
+
   return (
     <Layout>
+      {message && showMessage}
       <h1 className="text-center text-2xl text-white font-light">
         Crear nueva cuenta
       </h1>
