@@ -21,7 +21,6 @@ const Signup = () => {
 
   const [newUser] = useMutation(NEW_ACCOUNT)
   const router = useRouter()
-
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -82,10 +81,10 @@ const Signup = () => {
 
   return (
     <Layout>
-      {message && showMessage}
       <h1 className="text-center text-2xl text-white font-light">
         Crear nueva cuenta
       </h1>
+      {message && showMessage}
       <div className="flex justify-center mt-5">
         <div className="w-full max-w-sm">
           <form

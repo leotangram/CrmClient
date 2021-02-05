@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import { gql, useMutation } from '@apollo/client'
 import * as Yup from 'yup'
@@ -12,8 +14,10 @@ const AUTH_USER = gql`
 `
 
 const login = () => {
-  const [authenticateUser] = useMutation(AUTH_USER)
+  const [message, setMessage] = useState('')
 
+  const router = useRouter()
+  const [authenticateUser] = useMutation(AUTH_USER)
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -21,7 +25,7 @@ const login = () => {
     },
     onSubmit: async ({ email, password }) => {
       try {
-        const { data } = authenticateUser({
+        const { data } = await authenticateUser({
           variables: {
             input: {
               email,
@@ -29,8 +33,18 @@ const login = () => {
             }
           }
         })
+        setMessage('Autenticanto...')
+        const { token } = data.authenticateUser
+        localStorage.setItem('token', token)
+        setTimeout(() => {
+          setMessage('')
+          router.push('/')
+        }, 2000)
       } catch (error) {
-        console.log({ error })
+        setMessage(error.message)
+        setTimeout(() => {
+          setMessage('')
+        }, 3000)
       }
     },
     validationSchema: Yup.object({
@@ -50,9 +64,16 @@ const login = () => {
     values: { email, password }
   } = formik
 
+  const showMessage = (
+    <div className="bg-white py-2 px-3 w-full my-3 max-w-sm text-center mx-auto">
+      <p>{message}</p>
+    </div>
+  )
+
   return (
     <Layout>
       <h1 className="text-center text-2xl text-white font-light">Login</h1>
+      {message && showMessage}
       <div className="flex justify-center mt-5">
         <div className="w-full max-w-sm">
           <form
