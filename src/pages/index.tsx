@@ -1,7 +1,7 @@
+import { useRouter } from 'next/router'
 import { gql, useQuery } from '@apollo/client'
 import Layout from '../components/Layout'
 import { IClient } from '../interfaces/IClient'
-import client from '../config/apollo'
 
 const GET_CLIENTS_SELLER = gql`
   query getClientsSeller {
@@ -16,9 +16,15 @@ const GET_CLIENTS_SELLER = gql`
 `
 
 const Home = () => {
-  const { data, loading, error } = useQuery(GET_CLIENTS_SELLER)
+  const router = useRouter()
+  const { data, loading, client } = useQuery(GET_CLIENTS_SELLER)
 
   if (loading) return 'Cargando...'
+  if (!data.getClientsSeller) {
+    client.clearStore()
+    router.push('/login')
+    return null
+  }
 
   return (
     <Layout>
@@ -32,7 +38,7 @@ const Home = () => {
           </tr>
         </thead>
         <tbody className="bg-white">
-          {data?.getClientsSeller.map(
+          {data?.getClientsSeller?.map(
             ({ company, email, id, name, surname }: IClient) => (
               <tr key={id}>
                 <td className="border px-4 px-4 py-2">
