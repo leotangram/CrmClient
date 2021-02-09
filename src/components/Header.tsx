@@ -16,7 +16,7 @@ const Header = () => {
   const router = useRouter()
   const { data, loading, client } = useQuery(GET_USER)
 
-  if (loading) return 'Cargando...'
+  if (loading) return null
   if (!data.getUser) {
     client.clearStore()
     router.push('/login')

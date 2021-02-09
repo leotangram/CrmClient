@@ -13,7 +13,7 @@ const AUTH_USER = gql`
   }
 `
 
-const login = () => {
+const Login = () => {
   const [message, setMessage] = useState('')
 
   const router = useRouter()
@@ -139,4 +139,4 @@ const login = () => {
   )
 }
 
-export default login
+export default Login
