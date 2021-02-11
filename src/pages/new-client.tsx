@@ -3,6 +3,7 @@ import { useFormik } from 'formik'
 import { gql, useMutation } from '@apollo/client'
 import * as Yup from 'yup'
 import Layout from '../components/Layout'
+import { IClient } from '../interfaces/IClient'
 
 const NEW_CLIENT = gql`
   mutation newClient($input: ClientInput) {
@@ -17,9 +18,33 @@ const NEW_CLIENT = gql`
   }
 `
 
+const GET_CLIENTS_SELLER = gql`
+  query getClientsSeller {
+    getClientsSeller {
+      id
+      name
+      surname
+      company
+      email
+    }
+  }
+`
+
 const NewClient = () => {
   const router = useRouter()
-  const [newClient] = useMutation(NEW_CLIENT)
+  const [newClient] = useMutation(NEW_CLIENT, {
+    update(cache, { data }) {
+      const { getClientsSeller } = cache.readQuery({
+        query: GET_CLIENTS_SELLER
+      })
+      cache.writeQuery({
+        query: GET_CLIENTS_SELLER,
+        data: {
+          getClientsSeller: [...getClientsSeller, data.newClient]
+        }
+      })
+    }
+  })
 
   const formik = useFormik({
     initialValues: {
