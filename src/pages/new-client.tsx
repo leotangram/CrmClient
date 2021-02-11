@@ -1,8 +1,26 @@
+import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
+import { gql, useMutation } from '@apollo/client'
 import * as Yup from 'yup'
 import Layout from '../components/Layout'
 
+const NEW_CLIENT = gql`
+  mutation newClient($input: ClientInput) {
+    newClient(input: $input) {
+      id
+      name
+      surname
+      company
+      email
+      phone
+    }
+  }
+`
+
 const NewClient = () => {
+  const router = useRouter()
+  const [newClient] = useMutation(NEW_CLIENT)
+
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -11,8 +29,23 @@ const NewClient = () => {
       email: '',
       phone: ''
     },
-    onSubmit: async values => {
-      console.log(values)
+    onSubmit: async ({ name, surname, company, email, phone }) => {
+      try {
+        const { data } = await newClient({
+          variables: {
+            input: {
+              name,
+              surname,
+              company,
+              email,
+              phone
+            }
+          }
+        })
+        router.push('/')
+      } catch (error) {
+        console.log(error)
+      }
     },
     validationSchema: Yup.object({
       name: Yup.string().required('El nombre del cliente es obligatorio'),
