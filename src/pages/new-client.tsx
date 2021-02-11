@@ -2,8 +2,8 @@ import { useRouter } from 'next/router'
 import { useFormik } from 'formik'
 import { gql, useMutation } from '@apollo/client'
 import * as Yup from 'yup'
+import { useState } from 'react'
 import Layout from '../components/Layout'
-import { IClient } from '../interfaces/IClient'
 
 const NEW_CLIENT = gql`
   mutation newClient($input: ClientInput) {
@@ -31,6 +31,8 @@ const GET_CLIENTS_SELLER = gql`
 `
 
 const NewClient = () => {
+  const [message, setMessage] = useState('')
+
   const router = useRouter()
   const [newClient] = useMutation(NEW_CLIENT, {
     update(cache, { data }) {
@@ -56,7 +58,7 @@ const NewClient = () => {
     },
     onSubmit: async ({ name, surname, company, email, phone }) => {
       try {
-        const { data } = await newClient({
+        await newClient({
           variables: {
             input: {
               name,
@@ -69,7 +71,7 @@ const NewClient = () => {
         })
         router.push('/')
       } catch (error) {
-        console.log(error)
+        setMessage(error.message)
       }
     },
     validationSchema: Yup.object({
@@ -91,9 +93,16 @@ const NewClient = () => {
     values: { name, surname, company, email, phone }
   } = formik
 
+  const showMessage = (
+    <div className="bg-white py-2 px-3 w-full my-3 max-w-sm text-center mx-auto">
+      <p>{message}</p>
+    </div>
+  )
+
   return (
     <Layout>
-      <h1>Nuevo Client</h1>
+      <h1 className="text-2xl text-gray-800 font-light">Nuevo Client</h1>
+      {message && showMessage}
       <div className="flex justify-center mt-5">
         <div className="w-full max-w-lg">
           <form
