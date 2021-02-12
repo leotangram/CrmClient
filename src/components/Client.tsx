@@ -9,8 +9,34 @@ const DELETE_CLIENT = gql`
   }
 `
 
+const GET_CLIENTS_SELLER = gql`
+  query getClientsSeller {
+    getClientsSeller {
+      id
+      name
+      surname
+      company
+      email
+    }
+  }
+`
+
 const Client = ({ id, name, surname, company, email }: IClient) => {
-  const [deleteClient] = useMutation(DELETE_CLIENT)
+  const [deleteClient] = useMutation(DELETE_CLIENT, {
+    update(cache) {
+      const { getClientsSeller } = cache.readQuery({
+        query: GET_CLIENTS_SELLER
+      })
+      cache.writeQuery({
+        query: GET_CLIENTS_SELLER,
+        data: {
+          getClientsSeller: getClientsSeller.filter(
+            (currentClient: { id: string }) => currentClient.id !== id
+          )
+        }
+      })
+    }
+  })
 
   const confirmDeleteClient = () => {
     Swal.fire({
