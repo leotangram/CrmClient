@@ -1,9 +1,24 @@
 import React from 'react'
+import Swal from 'sweetalert2'
 import { IClient } from '../interfaces/IClient'
 
 const Client = ({ id, name, surname, company, email }: IClient) => {
   const confirmDeleteClient = () => {
-    console.log('Eliminando', id)
+    Swal.fire({
+      title: '¿Deseas eliminar este cliente?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if (result.isConfirmed) {
+        console.log('Eliminando...', id)
+        Swal.fire('Deleted!', 'Your file has been deleted.', 'success')
+      }
+    })
   }
 
   return (
