@@ -1,8 +1,17 @@
 import React from 'react'
 import Swal from 'sweetalert2'
+import { gql, useMutation } from '@apollo/client'
 import { IClient } from '../interfaces/IClient'
 
+const DELETE_CLIENT = gql`
+  mutation deleteClient($id: ID!) {
+    deleteClient(id: $id)
+  }
+`
+
 const Client = ({ id, name, surname, company, email }: IClient) => {
+  const [deleteClient] = useMutation(DELETE_CLIENT)
+
   const confirmDeleteClient = () => {
     Swal.fire({
       title: '¿Deseas eliminar este cliente?',
@@ -13,10 +22,18 @@ const Client = ({ id, name, surname, company, email }: IClient) => {
       cancelButtonColor: '#d33',
       confirmButtonText: 'Si, eliminar',
       cancelButtonText: 'Cancelar'
-    }).then(result => {
+    }).then(async result => {
       if (result.isConfirmed) {
-        console.log('Eliminando...', id)
-        Swal.fire('Deleted!', 'Your file has been deleted.', 'success')
+        try {
+          const { data } = await deleteClient({
+            variables: {
+              id
+            }
+          })
+          Swal.fire('Eliminar', data.deleteClient, 'success')
+        } catch (error) {
+          Swal.fire('Eliminar', error.message, 'error')
+        }
       }
     })
   }
