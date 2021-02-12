@@ -1,4 +1,4 @@
-import React from 'react'
+import Router from 'next/router'
 import Swal from 'sweetalert2'
 import { gql, useMutation } from '@apollo/client'
 import { IClient } from '../interfaces/IClient'
@@ -64,6 +64,13 @@ const Client = ({ id, name, surname, company, email }: IClient) => {
     })
   }
 
+  const editClient = () => {
+    Router.push({
+      pathname: '/edit-client/[id]',
+      query: { id }
+    })
+  }
+
   return (
     <tr>
       <td className="border px-4 px-4 py-2">
@@ -78,6 +85,29 @@ const Client = ({ id, name, surname, company, email }: IClient) => {
           type="button"
         >
           Eliminar{' '}
+          <svg
+            className="w-4 h-4 ml-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </button>
+      </td>
+      <td className="border px-4 px-4 py-2">
+        <button
+          className="flex items-center bg-green-600 py-2 px-4 w-full text-white justify-center rounded text-xs uppercase font-bold"
+          onClick={editClient}
+          type="button"
+        >
+          Editar{' '}
           <svg
             className="w-4 h-4 ml-2"
             fill="none"
