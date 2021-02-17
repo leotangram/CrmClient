@@ -2,6 +2,7 @@ import React from 'react'
 import { useRouter } from 'next/router'
 import { gql, useQuery } from '@apollo/client'
 import { Formik } from 'formik'
+import * as Yup from 'yup'
 import Layout from '@/components/Layout'
 
 const GET_CLIENT = gql`
@@ -32,6 +33,15 @@ const EditClient = () => {
   console.log({ loading })
   console.log({ error })
 
+  const validationSchema = Yup.object({
+    name: Yup.string().required('El nombre del cliente es obligatorio'),
+    surname: Yup.string().required('El apellido del cliente es obligatorio'),
+    company: Yup.string().required('La empresa del cliente es obligatoria'),
+    email: Yup.string()
+      .email('El email no es válido')
+      .required('El email es necesario')
+  })
+
   if (loading) <span>Cargando...</span>
 
   return (
@@ -39,7 +49,7 @@ const EditClient = () => {
       <h1 className="text-2xl text-gray-800 font-light">Editar cliente</h1>
       <div className="flex justify-center mt-5">
         <div className="w-full max-w-lg">
-          <Formik>
+          <Formik validationSchema={validationSchema}>
             {({ errors, handleBlur, handleChange, handleSubmit, touched }) => (
               <form
                 className="bg-white shadow-md px-8 pt-6 pb-8 mb-4"
