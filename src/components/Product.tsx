@@ -1,46 +1,44 @@
-import Router from 'next/router'
-import Swal from 'sweetalert2'
 import { gql, useMutation } from '@apollo/client'
-import { IClient } from '../interfaces/IClient'
+import Swal from 'sweetalert2'
+import { IProduct } from '../interfaces/IProduct'
 
-const DELETE_CLIENT = gql`
-  mutation deleteClient($id: ID!) {
-    deleteClient(id: $id)
+const DELETE_PRODUCT = gql`
+  mutation deleteProduct($id: ID!) {
+    deleteProduct(id: $id)
   }
 `
 
-const GET_CLIENTS_SELLER = gql`
-  query getClientsSeller {
-    getClientsSeller {
+const GET_PRODUCTS = gql`
+  query getProducts {
+    getProducts {
       id
       name
-      surname
-      company
-      email
+      existence
+      price
     }
   }
 `
 
-const Client = ({ id, name, surname, company, email }: IClient) => {
-  const [deleteClient] = useMutation(DELETE_CLIENT, {
+const Product = ({ existence, id, name, price }: IProduct) => {
+  const [deleteProduct] = useMutation(DELETE_PRODUCT, {
     update(cache) {
-      const { getClientsSeller }: any = cache.readQuery({
-        query: GET_CLIENTS_SELLER
+      const { getProducts }: any = cache.readQuery({
+        query: GET_PRODUCTS
       })
       cache.writeQuery({
-        query: GET_CLIENTS_SELLER,
+        query: GET_PRODUCTS,
         data: {
-          getClientsSeller: getClientsSeller.filter(
-            (currentClient: { id: string }) => currentClient.id !== id
+          getProducts: getProducts.filter(
+            (currentProduct: IProduct) => currentProduct.id !== id
           )
         }
       })
     }
   })
 
-  const confirmDeleteClient = () => {
+  const confirmDeleteProduct = () => {
     Swal.fire({
-      title: '¿Deseas eliminar este cliente?',
+      title: '¿Deseas eliminar este producto?',
       text: 'Esta acción no se puede deshacer',
       icon: 'warning',
       showCancelButton: true,
@@ -51,37 +49,28 @@ const Client = ({ id, name, surname, company, email }: IClient) => {
     }).then(async result => {
       if (result.isConfirmed) {
         try {
-          const { data } = await deleteClient({
+          const { data } = await deleteProduct({
             variables: {
               id
             }
           })
-          Swal.fire('Eliminar', data.deleteClient, 'success')
+          Swal.fire('Producto eliminado', data.deleteProduct, 'success')
         } catch (error) {
-          Swal.fire('Eliminar', error.message, 'error')
+          Swal.fire('Error', error.message, 'error')
         }
       }
     })
   }
 
-  const editClient = () => {
-    Router.push({
-      pathname: '/edit-client/[id]',
-      query: { id }
-    })
-  }
-
   return (
     <tr>
-      <td className="border px-4 px-4 py-2">
-        {name} {surname}
-      </td>
-      <td className="border px-4 px-4 py-2">{company}</td>
-      <td className="border px-4 px-4 py-2">{email}</td>
-      <td className="border px-4 px-4 py-2">
+      <td className="border px-4 py-2">{name}</td>
+      <td className="border px-4 py-2">{existence} Unidades</td>
+      <td className="border px-4 py-2">$ {price}</td>
+      <td className="border px-4 py-2">
         <button
           className="flex items-center bg-red-800 py-2 px-4 w-full text-white justify-center rounded text-xs uppercase font-bold"
-          onClick={confirmDeleteClient}
+          onClick={confirmDeleteProduct}
           type="button"
         >
           Eliminar{' '}
@@ -101,10 +90,10 @@ const Client = ({ id, name, surname, company, email }: IClient) => {
           </svg>
         </button>
       </td>
-      <td className="border px-4 px-4 py-2">
+      <td className="border px-4 py-2">
         <button
           className="flex items-center bg-green-600 py-2 px-4 w-full text-white justify-center rounded text-xs uppercase font-bold"
-          onClick={editClient}
+          // onClick={editClient}
           type="button"
         >
           Editar{' '}
@@ -128,4 +117,4 @@ const Client = ({ id, name, surname, company, email }: IClient) => {
   )
 }
 
-export default Client
+export default Product
