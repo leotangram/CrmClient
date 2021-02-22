@@ -1,9 +1,10 @@
-import React from 'react'
-import { useRouter } from 'next/router'
-import { gql, useQuery } from '@apollo/client'
-import { Formik } from 'formik'
 import * as Yup from 'yup'
+import Swal from 'sweetalert2'
+import { useRouter } from 'next/router'
+import { gql, useQuery, useMutation } from '@apollo/client'
+import { Formik } from 'formik'
 import Layout from '@/components/Layout'
+import { IClient } from '../../interfaces/IClient'
 
 const GET_CLIENT = gql`
   query getClient($id: ID!) {
@@ -17,21 +18,28 @@ const GET_CLIENT = gql`
   }
 `
 
+const UPDATE_CLIENT = gql`
+  mutation updateClient($id: ID!, $input: ClientInput) {
+    updateClient(id: $id, input: $input) {
+      name
+      email
+    }
+  }
+`
+
 const EditClient = () => {
   const router = useRouter()
   const {
     query: { id }
   } = router
 
-  const { data, loading, error } = useQuery(GET_CLIENT, {
+  const { data, loading } = useQuery(GET_CLIENT, {
     variables: {
       id
     }
   })
 
-  console.log({ data })
-  console.log({ loading })
-  console.log({ error })
+  const [updateClient] = useMutation(UPDATE_CLIENT)
 
   const validationSchema = Yup.object({
     name: Yup.string().required('El nombre del cliente es obligatorio'),
@@ -42,15 +50,55 @@ const EditClient = () => {
       .required('El email es necesario')
   })
 
-  if (loading) <span>Cargando...</span>
+  if (loading) return <span>Cargando...</span>
+
+  const updateInfoClient = async (values: IClient) => {
+    const { name, surname, company, email, phone } = values
+    try {
+      const response = await updateClient({
+        variables: {
+          id,
+          input: {
+            name,
+            surname,
+            company,
+            email,
+            phone
+          }
+        }
+      })
+      Swal.fire(
+        'Actualizado',
+        'El cliente se actualizó correctamente',
+        'success'
+      )
+      router.push('/')
+    } catch (error) {
+      Swal.fire('Error', error.message, 'error')
+    }
+  }
 
   return (
     <Layout>
       <h1 className="text-2xl text-gray-800 font-light">Editar cliente</h1>
       <div className="flex justify-center mt-5">
         <div className="w-full max-w-lg">
-          <Formik validationSchema={validationSchema}>
-            {({ errors, handleBlur, handleChange, handleSubmit, touched }) => (
+          <Formik
+            enableReinitialize
+            initialValues={data?.getClient}
+            onSubmit={values => {
+              updateInfoClient(values)
+            }}
+            validationSchema={validationSchema}
+          >
+            {({
+              errors,
+              handleBlur,
+              handleChange,
+              handleSubmit,
+              touched,
+              values
+            }) => (
               <form
                 className="bg-white shadow-md px-8 pt-6 pb-8 mb-4"
                 onSubmit={handleSubmit}
@@ -69,7 +117,7 @@ const EditClient = () => {
                     onChange={handleChange}
                     placeholder="Nombre cliente"
                     type="text"
-                    // value={name}
+                    value={values?.name}
                   />
                   {touched.name && errors.name && (
                     <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
@@ -92,7 +140,7 @@ const EditClient = () => {
                     onChange={handleChange}
                     placeholder="Apellido cliente"
                     type="text"
-                    // value={surname}
+                    value={values?.surname}
                   />
                   {touched.surname && errors.surname && (
                     <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
@@ -115,7 +163,7 @@ const EditClient = () => {
                     onChange={handleChange}
                     placeholder="Empresa cliente"
                     type="text"
-                    // value={company}
+                    value={values?.company}
                   />
                   {touched.company && errors.company && (
                     <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
@@ -138,7 +186,7 @@ const EditClient = () => {
                     onChange={handleChange}
                     placeholder="Email cliente"
                     type="email"
-                    // value={email}
+                    value={values?.email}
                   />
                   {touched.email && errors.email && (
                     <div className="my-2 bg-red-100 border-l-4 border-red-500 text-red-700 p-4">
@@ -161,7 +209,7 @@ const EditClient = () => {
                     onChange={handleChange}
                     placeholder="Teléfono cliente"
                     type="tel"
-                    // value={phone}
+                    value={values?.phone}
                   />
                 </div>
                 <button
