@@ -36,7 +36,7 @@ const NewClient = () => {
   const router = useRouter()
   const [newClient] = useMutation(NEW_CLIENT, {
     update(cache, { data }) {
-      const { getClientsSeller } = cache.readQuery({
+      const { getClientsSeller }: any = cache.readQuery({
         query: GET_CLIENTS_SELLER
       })
       cache.writeQuery({
