@@ -1,3 +1,4 @@
+import Router from 'next/router'
 import { gql, useMutation } from '@apollo/client'
 import Swal from 'sweetalert2'
 import { IProduct } from '../interfaces/IProduct'
@@ -62,6 +63,13 @@ const Product = ({ existence, id, name, price }: IProduct) => {
     })
   }
 
+  const editProduct = () => {
+    Router.push({
+      pathname: 'edit-product/[id]',
+      query: { id }
+    })
+  }
+
   return (
     <tr>
       <td className="border px-4 py-2">{name}</td>
@@ -93,7 +101,7 @@ const Product = ({ existence, id, name, price }: IProduct) => {
       <td className="border px-4 py-2">
         <button
           className="flex items-center bg-green-600 py-2 px-4 w-full text-white justify-center rounded text-xs uppercase font-bold"
-          // onClick={editClient}
+          onClick={editProduct}
           type="button"
         >
           Editar{' '}
