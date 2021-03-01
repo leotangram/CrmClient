@@ -1,31 +1,57 @@
-import { useEffect, useState } from 'react'
-import Select from 'react-select'
+import { useContext, useEffect, useState } from 'react'
+import { gql, useQuery } from '@apollo/client'
+import Select, { ValueType } from 'react-select'
+import { IClient } from '../../interfaces/IClient'
+import OrderContext from '../../context/orders/OrderContext'
 
-const clients = [
-  { id: '1', name: 'Juan' },
-  { id: '2', name: 'Pedro' },
-  { id: '3', name: 'Oscar' }
-]
+const GET_CLIENTS_SELLER = gql`
+  query getClientsSeller {
+    getClientsSeller {
+      id
+      name
+      surname
+      company
+      email
+    }
+  }
+`
 
 const AsignClient = () => {
-  const [currentClients, setClient] = useState([])
+  const [currentClient, setCurrentClient] = useState<IClient | null>(null)
+
+  const orderContext = useContext(OrderContext)
+  const { addClient } = orderContext
+
+  const { data, loading, error } = useQuery(GET_CLIENTS_SELLER)
 
   useEffect(() => {
-    console.log('client', currentClients)
-  }, [currentClients])
+    addClient(currentClient)
+  }, [currentClient])
 
-  const selectClients = (selectedClients: any) => setClient(selectedClients)
+  const selectClient = (selectedClient: ValueType<IClient, false>) => {
+    setCurrentClient(selectedClient)
+  }
+
+  if (loading) return null
+
+  const { getClientsSeller }: { getClientsSeller: IClient[] } = data
 
   return (
-    <Select
-      getOptionLabel={optionsLabel => optionsLabel.name}
-      getOptionValue={optionsValue => optionsValue.id}
-      isMulti
-      noOptionsMessage={() => 'No hay resultados'}
-      onChange={selectedClients => selectClients(selectedClients)}
-      options={clients}
-      placeholder="Busque o seleccione el cliente"
-    />
+    <>
+      <p className="mt-10 my-2 bg-white border-l-4 border-gray-800 text-gray-700 p-2 text-sm font-bold">
+        1.- Asigna un cliente al pedido
+      </p>
+      <Select<IClient>
+        className="mt-3"
+        getOptionLabel={({ name }): string => name}
+        getOptionValue={({ id }): string => id ?? ''}
+        noOptionsMessage={() => 'No hay resultados'}
+        onChange={selectClient}
+        options={getClientsSeller}
+        placeholder="Busque o seleccione el cliente"
+        value={currentClient}
+      />
+    </>
   )
 }
 
