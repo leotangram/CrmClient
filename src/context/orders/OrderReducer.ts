@@ -1,5 +1,10 @@
 import { IOrder } from '@/interfaces/IOrder'
-import { ActionTypeOrders, SELECT_CLIENT, SELECT_PRODUCTS } from '../../types'
+import {
+  ActionTypeOrders,
+  QUANTITY_OF_PRODUCTS,
+  SELECT_CLIENT,
+  SELECT_PRODUCTS
+} from '../../types'
 
 export default (state: IOrder, action: ActionTypeOrders) => {
   switch (action.type) {
@@ -11,7 +16,14 @@ export default (state: IOrder, action: ActionTypeOrders) => {
     case SELECT_PRODUCTS:
       return {
         ...state,
-        order: action.payload
+        products: action.payload
+      }
+    case QUANTITY_OF_PRODUCTS:
+      return {
+        ...state,
+        products: state.products?.map(product =>
+          product.id === action.payload.id ? action.payload : product
+        )
       }
     default:
       return state

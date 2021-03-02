@@ -8,16 +8,18 @@ export interface IOrderProduct {
 
 export interface IOrder {
   id?: string
-  order: IOrderProduct[]
-  total: number
-  client: string | IClient | null
+  order?: IOrderProduct[]
+  products?: IProduct[]
+  total?: number
+  client?: string | IClient | null
   seller?: string
   state?: 'PENDING' | 'COMPLETED' | 'CANCELLED'
   created?: Date
 }
 
 export interface IOrderContext {
-  order?: IOrder[]
+  products?: IProduct[]
   addClient?: (client: IClient) => void
   addProducts?: (products: IProduct[]) => void
+  quantityProducts?: (newProduct: IProduct) => void
 }

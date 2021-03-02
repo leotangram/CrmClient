@@ -9,4 +9,4 @@ export const QUANTITY_OF_PRODUCTS = 'QUANTITY_OF_PRODUCTS'
 export type ActionTypeOrders =
   | { type: 'SELECT_CLIENT'; payload: IClient }
   | { type: 'SELECT_PRODUCTS'; payload: IProduct[] }
-  | { type: 'QUANTITY_OF_PRODUCTS' }
+  | { type: 'QUANTITY_OF_PRODUCTS'; payload: IProduct }

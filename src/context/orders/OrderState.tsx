@@ -1,7 +1,11 @@
 import { FC, useReducer } from 'react'
 import { IClient } from '../../interfaces/IClient'
 import { IOrder } from '../../interfaces/IOrder'
-import { SELECT_CLIENT, SELECT_PRODUCTS } from '../../types/index'
+import {
+  QUANTITY_OF_PRODUCTS,
+  SELECT_CLIENT,
+  SELECT_PRODUCTS
+} from '../../types/index'
 import { IProduct } from '../../interfaces/IProduct'
 import OrderContext from './OrderContext'
 import OrderReducer from './OrderReducer'
@@ -9,7 +13,7 @@ import OrderReducer from './OrderReducer'
 const OrderState: FC = ({ children }) => {
   const initialState: IOrder = {
     client: null,
-    order: [],
+    products: [],
     total: 0
   }
 
@@ -29,8 +33,22 @@ const OrderState: FC = ({ children }) => {
     })
   }
 
+  const quantityProducts = (newProduct: IProduct) => {
+    dispatch({
+      type: QUANTITY_OF_PRODUCTS,
+      payload: newProduct
+    })
+  }
+
   return (
-    <OrderContext.Provider value={{ addClient, addProducts }}>
+    <OrderContext.Provider
+      value={{
+        addClient,
+        addProducts,
+        products: state.products,
+        quantityProducts
+      }}
+    >
       {children}
     </OrderContext.Provider>
   )
