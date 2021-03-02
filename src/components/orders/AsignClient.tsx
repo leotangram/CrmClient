@@ -22,10 +22,12 @@ const AsignClient = () => {
   const orderContext = useContext(OrderContext)
   const { addClient } = orderContext
 
-  const { data, loading, error } = useQuery(GET_CLIENTS_SELLER)
+  const { data, loading } = useQuery(GET_CLIENTS_SELLER)
 
   useEffect(() => {
-    addClient(currentClient)
+    if (addClient && currentClient) {
+      addClient(currentClient)
+    }
   }, [currentClient])
 
   const selectClient = (selectedClient: ValueType<IClient, false>) => {
@@ -41,7 +43,7 @@ const AsignClient = () => {
       <p className="mt-10 my-2 bg-white border-l-4 border-gray-800 text-gray-700 p-2 text-sm font-bold">
         1.- Asigna un cliente al pedido
       </p>
-      <Select<IClient>
+      <Select
         className="mt-3"
         getOptionLabel={({ name }): string => name}
         getOptionValue={({ id }): string => id ?? ''}

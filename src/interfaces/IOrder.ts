@@ -1,4 +1,5 @@
 import { IClient } from './IClient'
+import { IProduct } from './IProduct'
 
 export interface IOrderProduct {
   id?: string
@@ -13,4 +14,10 @@ export interface IOrder {
   seller?: string
   state?: 'PENDING' | 'COMPLETED' | 'CANCELLED'
   created?: Date
+}
+
+export interface IOrderContext {
+  order?: IOrder[]
+  addClient?: (client: IClient) => void
+  addProducts?: (products: IProduct[]) => void
 }
