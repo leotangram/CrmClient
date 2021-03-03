@@ -26,10 +26,21 @@ const OrderState: FC = ({ children }) => {
     })
   }
 
-  const addProducts = (products: IProduct[]) => {
+  const addProducts = (selectedProducts: IProduct[]) => {
+    let newState: IProduct[]
+    if (state.products && state.products.length > 0) {
+      newState = selectedProducts.map(product => {
+        const newObject = state.products?.find(
+          productState => productState.id === product.id
+        )
+        return { ...product, ...newObject }
+      })
+    } else {
+      newState = selectedProducts
+    }
     dispatch({
       type: SELECT_PRODUCTS,
-      payload: products
+      payload: newState
     })
   }
 
