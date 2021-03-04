@@ -3,10 +3,11 @@ import {
   ActionTypeOrders,
   QUANTITY_OF_PRODUCTS,
   SELECT_CLIENT,
-  SELECT_PRODUCTS
+  SELECT_PRODUCTS,
+  UPDATE_TOTAL
 } from '../../types'
 
-export default (state: IOrder, action: ActionTypeOrders) => {
+const OrderReducer = (state: IOrder, action: ActionTypeOrders) => {
   switch (action.type) {
     case SELECT_CLIENT:
       return {
@@ -25,7 +26,20 @@ export default (state: IOrder, action: ActionTypeOrders) => {
           product.id === action.payload.id ? action.payload : product
         )
       }
+    case UPDATE_TOTAL:
+      return {
+        ...state,
+        total: state.products?.reduce(
+          (newTotal, article) =>
+            article.quantity
+              ? (newTotal + article.quantity) * article.price
+              : 0,
+          0
+        )
+      }
     default:
       return state
   }
 }
+
+export default OrderReducer

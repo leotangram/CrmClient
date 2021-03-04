@@ -6,20 +6,19 @@ const ProductResume = ({ product }: { product: IProduct }) => {
   const { name, price } = product
 
   const orderContext = useContext(OrderContext)
-  const { quantityProducts } = orderContext
+  const { quantityProducts, updateTotal } = orderContext
 
   const [quantity, setQuantity] = useState(0)
 
   useEffect(() => {
-    updateQuantity()
+    if (quantityProducts) {
+      const newProduct = { ...product, quantity }
+      quantityProducts(newProduct)
+    }
+    if (updateTotal) {
+      updateTotal()
+    }
   }, [quantity])
-
-  if (!quantityProducts) return null
-
-  const updateQuantity = () => {
-    const newProduct = { ...product, quantity }
-    quantityProducts(newProduct)
-  }
 
   return (
     <div className="md:flex md:justify-between md:items-center mt-5">

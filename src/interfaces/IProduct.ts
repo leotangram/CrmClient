@@ -4,4 +4,5 @@ export interface IProduct {
   existence: number
   price: number
   created?: Date
+  quantity?: number
 }

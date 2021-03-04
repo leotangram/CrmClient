@@ -11,15 +11,18 @@ export interface IOrder {
   order?: IOrderProduct[]
   products?: IProduct[]
   total?: number
-  client?: string | IClient | null
+  client?: IClient | null
   seller?: string
   state?: 'PENDING' | 'COMPLETED' | 'CANCELLED'
   created?: Date
 }
 
 export interface IOrderContext {
-  products?: IProduct[]
   addClient?: (client: IClient) => void
+  client?: IClient | null
+  products?: IProduct[]
   addProducts?: (products: IProduct[]) => void
   quantityProducts?: (newProduct: IProduct) => void
+  total?: number
+  updateTotal?: () => void
 }

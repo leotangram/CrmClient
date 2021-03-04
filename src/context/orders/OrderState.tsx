@@ -4,7 +4,8 @@ import { IOrder } from '../../interfaces/IOrder'
 import {
   QUANTITY_OF_PRODUCTS,
   SELECT_CLIENT,
-  SELECT_PRODUCTS
+  SELECT_PRODUCTS,
+  UPDATE_TOTAL
 } from '../../types/index'
 import { IProduct } from '../../interfaces/IProduct'
 import OrderContext from './OrderContext'
@@ -51,13 +52,20 @@ const OrderState: FC = ({ children }) => {
     })
   }
 
+  const updateTotal = () => {
+    dispatch({ type: UPDATE_TOTAL })
+  }
+
   return (
     <OrderContext.Provider
       value={{
         addClient,
         addProducts,
+        client: state.client,
         products: state.products,
-        quantityProducts
+        quantityProducts,
+        total: state.total,
+        updateTotal
       }}
     >
       {children}
