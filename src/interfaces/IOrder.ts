@@ -3,12 +3,13 @@ import { IProduct } from './IProduct'
 
 export interface IOrderProduct {
   id?: string
+  name?: string
   quantity: number
 }
 
 export interface IOrder {
   id?: string
-  order?: IOrderProduct[]
+  order: IOrderProduct[]
   products?: IProduct[]
   total?: number
   client?: IClient | null
