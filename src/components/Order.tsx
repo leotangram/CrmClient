@@ -1,5 +1,29 @@
 import { FC, useEffect, useState } from 'react'
+import { gql, useMutation } from '@apollo/client'
+import Swal from 'sweetalert2'
 import { IOrder } from '@/interfaces/IOrder'
+
+const UPDATE_ORDER = gql`
+  mutation updateOrder($id: ID!, $input: OrderInput) {
+    updateOrder(id: $id, input: $input) {
+      state
+    }
+  }
+`
+
+const DELETE_ORDER = gql`
+  mutation deleteOrder($id: ID!) {
+    deleteOrder(id: $id)
+  }
+`
+
+const GET_ORDERS_SELLER = gql`
+  query getOrdersSeller {
+    getOrdersSeller {
+      id
+    }
+  }
+`
 
 const ORDER_STATES = [
   { key: 'COMPLETED', value: 'Completado' },
@@ -7,17 +31,97 @@ const ORDER_STATES = [
   { key: 'CANCELLED', value: 'Cancelado' }
 ]
 
-const Order: FC<IOrder> = ({ client, order, state, total }) => {
+const Order: FC<IOrder> = ({ client, id, order, state, total }) => {
   const [orderState, setOrderState] = useState(state)
+  const [style, setStyle] = useState('')
+
+  const [updateOrder] = useMutation(UPDATE_ORDER)
+  const [deleteOrder] = useMutation(DELETE_ORDER, {
+    update(cache) {
+      const { getOrdersSeller }: any = cache.readQuery({
+        query: GET_ORDERS_SELLER
+      })
+      cache.writeQuery({
+        query: GET_ORDERS_SELLER,
+        data: {
+          getOrdersSeller: getOrdersSeller.filter(
+            (currentOrder: { id: string | undefined }) => currentOrder.id !== id
+          )
+        }
+      })
+    }
+  })
 
   useEffect(() => {
     if (orderState) {
       setOrderState(orderState)
     }
+    switch (orderState) {
+      case ORDER_STATES[0].key:
+        setStyle('border-green-500')
+        break
+      case ORDER_STATES[1].key:
+        setStyle('border-yellow-500')
+        break
+      case ORDER_STATES[2].key:
+        setStyle('border-red-800')
+        break
+
+      default:
+        break
+    }
   }, [orderState])
 
+  const changeOrderState = async (e: { target: { value: string } }) => {
+    const newState = e.target.value
+    try {
+      const { data } = await updateOrder({
+        variables: {
+          id,
+          input: {
+            state: newState,
+            client: client?.id
+          }
+        }
+      })
+      setOrderState(data.updateOrder.state)
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(error)
+    }
+  }
+
+  const confirmDeleteOrder = () => {
+    Swal.fire({
+      title: '¿Deseas eliminar este pedido?',
+      text: 'Esta acción no se puede deshacer',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Si, eliminar',
+      cancelButtonText: 'Cancelar'
+    }).then(async result => {
+      if (result.isConfirmed) {
+        try {
+          const { data } = await deleteOrder({
+            variables: {
+              id
+            }
+          })
+          Swal.fire('Eliminado', data.deleteOrder, 'success')
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.log(error)
+        }
+      }
+    })
+  }
+
   return (
-    <div className="mt-4 bg-white rounded p-6 md:grid md:grid-cols-2 md:gap-4 shadow-lg">
+    <div
+      className={`${style} border-t-4 mt-4 bg-white rounded p-6 md:grid md:grid-cols-2 md:gap-4 shadow-lg`}
+    >
       <div>
         <p className="font-bold text-gray-800">
           Cliente: {client?.name} {client?.surname}
@@ -63,6 +167,7 @@ const Order: FC<IOrder> = ({ client, order, state, total }) => {
         <h2 className="text-gray-800 font-bold mt-10">Estado pedido: </h2>
         <select
           className="mt-2 appearance-none bg-blue-600 border border-blue-600 text-white p-2 text-center rounded leading-tight focus:outline-none focus:bg-blue-600 focus:border-blue-500 uppercase text-xs font-bold"
+          onChange={changeOrderState}
           value={orderState}
         >
           {ORDER_STATES.map(({ key, value }) => (
@@ -74,7 +179,7 @@ const Order: FC<IOrder> = ({ client, order, state, total }) => {
       </div>
       <div>
         <h2 className="text-gray-800 font-bold mt-2">Resumen del pedido</h2>
-        {order.map(({ id, name, quantity }) => (
+        {order.map(({ name, quantity }) => (
           <div key={id} className="mt-4 ">
             <p className="text-sm text-gray-600">Producto: {name}</p>
             <p className="text-sm text-gray-600">Cantidad: {quantity}</p>
@@ -86,6 +191,7 @@ const Order: FC<IOrder> = ({ client, order, state, total }) => {
         <button
           type="button"
           className="uppercase text-xs font-bold flex flex-item mt-4 bg-red-800 px-5 py-2 inline-block text-white rounded leading-tight"
+          onClick={confirmDeleteOrder}
         >
           Eliminar pedido
           <svg
