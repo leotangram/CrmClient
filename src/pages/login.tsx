@@ -34,8 +34,10 @@ const Login = () => {
           }
         })
         setMessage('Autenticanto...')
-        const { token } = data.authenticateUser
-        localStorage.setItem('token', token)
+        setTimeout(() => {
+          const { token } = data.authenticateUser
+          localStorage.setItem('token', token)
+        }, 1000)
         setTimeout(() => {
           setMessage('')
           router.push('/')
